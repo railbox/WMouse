@@ -1,0 +1,10 @@
+bin/
+obj/
+*.layout
+*.depend
+_docs/
+build/
+*.bin
+_other/
+/*.bmp
+screens/

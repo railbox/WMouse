@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Menu" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="bin/Release/Menu" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdi32.a" />
+				</Linker>
+			</Target>
+			<Target title="Debug">
+				<Option output="bin/Debug/Menu" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libgdi32.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="draw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="draw.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/config.h" />
+		<Unit filename="src/font.h" />
+		<Unit filename="src/img.h" />
+		<Unit filename="src/lcd_hl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/lcd_hl.h" />
+		<Unit filename="src/log.h" />
+		<Unit filename="src/main_page.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/main_page.h" />
+		<Unit filename="src/menu_ll.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/menu_ll.h" />
+		<Unit filename="src/page.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/page.h" />
+		<Unit filename="src/z21client.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/z21client.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
