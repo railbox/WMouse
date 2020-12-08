@@ -18,6 +18,7 @@
 #include "img.h"
 #include "font.h"
 #include "string.h"
+#include "config.h"
 
 #ifdef _WIN32
 #define _WIN32_WINNT 0x0500
@@ -468,7 +469,7 @@ void lcd_set_loco_throttle(uint8_t level, bool state)
     static uint8_t last_level;
     uint8_t min_lev, max_lev;
 
-    if (level>10) level = 10;
+    if (level>LOCO_MAX_STEP) level = LOCO_MAX_STEP;
     if (level>last_level) {
         min_lev = last_level;
         max_lev = level;
@@ -476,11 +477,15 @@ void lcd_set_loco_throttle(uint8_t level, bool state)
         min_lev = level;
         max_lev = last_level;
     }
+    min_lev &= 0x1;
+    max_lev |= 0x1;
 
     if (state) {
         if (!last_mode_state) draw_rect(THROTTLE_X, THROTTLE_Y, 15, 25, true);
         for (uint8_t i=min_lev; i<=max_lev; i++) {
-            draw_hline(THROTTLE_X+2, THROTTLE_Y+(11-i)*2, 11, (i<=level) ? true : false);
+            uint8_t line = i/2;
+            if ((i&0x1) == 0) draw_hline(THROTTLE_X+2, THROTTLE_Y+(11-line)*2, 5, (i<=level) ? true : false);
+            else draw_hline(THROTTLE_X+7, THROTTLE_Y+(11-line)*2, 6, (i<=level) ? true : false);
         }
     } else {
         draw_rect(THROTTLE_X, THROTTLE_Y, 15, 25, false);

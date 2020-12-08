@@ -27,7 +27,6 @@
 
 #define INC(x,low,high)    (((x)==high)?(low):((x)+1))
 #define DEC(x,low,high)    (((x)==low)?(high):((x)-1))
-#define LOCO_MAX_STEP       10
 #define DEFAULT_IDLE_TIME_M 5
 #define SET_IP(_arr, _x1, _x2, _x3, _x4) {_arr[0]=_x1;_arr[1]=_x2;_arr[2]=_x3;_arr[3]=_x4;}
 #define MAX_TURNOUT_ID      1023
@@ -1086,7 +1085,7 @@ void loco_exit(void)
 static void SendSpeed(bool emergency_stop)
 {
     static uint8_t dir = 0x80;
-    uint8_t steps, speed, temp;
+    uint8_t steps, speed;
     steps = 128;
     if (config_db.loco_db[config_db.loco_db_pos].ss < sizeof(ss_val))
         steps = ss_val[config_db.loco_db[config_db.loco_db_pos].ss];
@@ -1099,17 +1098,13 @@ static void SendSpeed(bool emergency_stop)
     if (config_db.loco_db[config_db.loco_db_pos].speed) {
         switch (steps) {
           case 128:
-            speed = (abs(config_db.loco_db[config_db.loco_db_pos].speed) * (126 + LOCO_MAX_STEP/2)) / LOCO_MAX_STEP + (0x7F-126);
-            if (speed < 2) speed = 2;
+            speed = (abs(config_db.loco_db[config_db.loco_db_pos].speed) * 126 + LOCO_MAX_STEP/2) / LOCO_MAX_STEP + (0x7F-126);
             break;
           case 14:
-            speed = (abs(config_db.loco_db[config_db.loco_db_pos].speed) * (14 + LOCO_MAX_STEP/2)) / LOCO_MAX_STEP + (0xF-14);
-            if (speed < 2) speed = 2;
+            speed = (abs(config_db.loco_db[config_db.loco_db_pos].speed) * 14 + LOCO_MAX_STEP/2) / LOCO_MAX_STEP + (0xF-14);
             break;
           case 28:
-            temp = (abs(config_db.loco_db[config_db.loco_db_pos].speed) * (28 + LOCO_MAX_STEP/2)) / LOCO_MAX_STEP + (0x1F-28);
-            if (speed < 4) speed = 4;
-            speed = (temp>>1) || ((temp&0x1)<<4);
+            speed = (abs(config_db.loco_db[config_db.loco_db_pos].speed) * 28 + LOCO_MAX_STEP/2) / LOCO_MAX_STEP + (0x1F-28);
             break;
           default:
             break;

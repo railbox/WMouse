@@ -19,7 +19,7 @@
 
 //#define DEBUG_PRINT
 #define FW_MAJOR    1
-#define FW_MINOR    2
+#define FW_MINOR    3
 
 #ifdef __cplusplus
 #include <IPAddress.h>
@@ -40,6 +40,8 @@
 #define Z21_BUF_MAX_SIZE  24          //max UDP packet size
 #define Z21_PORT          21105       //Z21 UDP port
 #define UART_BAUDRATE     115200      //Default serial port baudrate
+#define LOCO_MAX_STEP     21
+
 
 //EEPROM Configuration /////////////////////////////////////////////////////
 #define EE_SIZE           4096
