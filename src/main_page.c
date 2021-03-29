@@ -1041,7 +1041,7 @@ static void loco_show_func(void)
     }
 }
 
-static void set_loco_throttle(void)
+static void set_loco_throttle(bool force)
 {
   static int8_t last_dir = 0x10;
   lcd_set_loco_throttle(abs(config_db.loco_db[config_db.loco_db_pos].speed), true);
@@ -1049,14 +1049,14 @@ static void set_loco_throttle(void)
   if (config_db.loco_db[config_db.loco_db_pos].speed > 0) cur_dir = 1;
   else if (config_db.loco_db[config_db.loco_db_pos].speed < 0) cur_dir = -1;
 
-  if (cur_dir != last_dir) loco_change_dir();
+  if ((cur_dir != last_dir) || force) loco_change_dir();
   last_dir = cur_dir;
 }
 
 void loco_begin(void)
 {
     lcd_begin();
-    set_loco_throttle();
+    set_loco_throttle(true);
     lcd_bottom_print(NULL, ALIGN_NONE);
     loco_show_func();
     loco_show();
@@ -1127,7 +1127,7 @@ void loco_next(void)
     } else if ((config_db.loco_db_pos < config_db.loco_db_len)
         && (config_db.loco_db[config_db.loco_db_pos].speed < LOCO_MAX_STEP)) {
         config_db.loco_db[config_db.loco_db_pos].speed++;
-        set_loco_throttle();
+        set_loco_throttle(false);
         SendSpeed(false);
 #if LOG_PRINTF_ENABLED
         loco_show();
@@ -1146,7 +1146,7 @@ void loco_prev(void)
     } else if ((config_db.loco_db_pos < config_db.loco_db_len)
         && (config_db.loco_db[config_db.loco_db_pos].speed > -LOCO_MAX_STEP)) {
         config_db.loco_db[config_db.loco_db_pos].speed--;
-        set_loco_throttle();
+        set_loco_throttle(false);
         SendSpeed(false);
 #if LOG_PRINTF_ENABLED
         loco_show();
@@ -1219,7 +1219,7 @@ void turnout_begin(void)
 {
     lcd_begin();
     loco_exit_local();
-    lcd_set_mode(false, false, false, true);
+    lcd_set_mode(false, config_db.turnout_state, false, true);
     turnout_show();
     lcd_commit();
 }
@@ -1246,9 +1246,10 @@ void turnout_set_id(uint16_t id)
 void turnout_set(bool state)
 {
     if (state) {
+        config_db.turnout_state = true;
         lcd_begin();
         turnout_show();
-        lcd_set_mode(false, true, false, true);
+        lcd_set_mode(false, config_db.turnout_state, false, true);
         lcd_commit();
         z21Client_setTrntPos(config_db.turnout_id-1, true, true);
         LOG_INFO_PRINTF("  Set turnout %u", config_db.turnout_id);
@@ -1260,9 +1261,10 @@ void turnout_set(bool state)
 void turnout_reset(bool state)
 {
     if (state) {
+        config_db.turnout_state = false;
         lcd_begin();
         turnout_show();
-        lcd_set_mode(false, false, false, true);
+        lcd_set_mode(false, config_db.turnout_state, false, true);
         lcd_commit();
         z21Client_setTrntPos(config_db.turnout_id-1, false, true);
         LOG_INFO_PRINTF("  Reset turnout %u", config_db.turnout_id);
@@ -1282,13 +1284,13 @@ void track_stop(void)
     if (current_page == PAGE_LOCO) {
         if (loco_func_shift) {
           config_db.loco_db[config_db.loco_db_pos].speed = 0;
-          set_loco_throttle();
+          set_loco_throttle(false);
           SendSpeed(true);
           return;
         }
         if (config_db.loco_db[config_db.loco_db_pos].speed) {
           config_db.loco_db[config_db.loco_db_pos].speed = 0;
-          set_loco_throttle();
+          set_loco_throttle(false);
           SendSpeed(false);
           return;
         }
@@ -1371,7 +1373,7 @@ static void notifyXNetExtSpeed(uint16_t locoAddress, uint8_t steps, uint8_t valu
         config_db.loco_db[config_db.loco_db_pos].speed = ((value & 0x80) ? 1 : -1) * ((int16_t)LOCO_MAX_STEP * (value & 0x7F) + (steps-1)/2) / (steps-1);
         if (current_page == PAGE_LOCO) {
           lcd_begin();
-          set_loco_throttle();
+          set_loco_throttle(false);
           lcd_commit();
         }
     }

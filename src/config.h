@@ -19,7 +19,7 @@
 
 //#define DEBUG_PRINT
 #define FW_MAJOR    1
-#define FW_MINOR    3
+#define FW_MINOR    4
 
 #ifdef __cplusplus
 #include <IPAddress.h>

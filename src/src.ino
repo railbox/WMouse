@@ -65,7 +65,7 @@ ESP8266HTTPUpdateServer httpUpdater(false, fw_notification_handler);
 extern "C" void WiFi_ResetToDefaults(void);
 
 static byte connectionTries = 0;
-static callback_handler_t wifi_timer, key_timeout_timer, powerdown_timer, status_timer, bat_timer, idle_timer;
+static callback_handler_t wifi_timer, key_timeout_timer, powerdown_timer, status_timer, bat_timer, idle_timer, page_repeat_timer;
 
 /**********************************************************************************/
 void DebugPrint(char *data) {
@@ -264,6 +264,7 @@ void setup() {
   powerdown_timer = callback_timer_create();
   idle_timer = callback_timer_create();
   bat_timer = callback_timer_create();
+  page_repeat_timer = callback_timer_create();
   
   EEPROM.begin(EE_SIZE);  //init EEPROM
   main_set_config_update_callback(config_update_callback);
@@ -315,6 +316,7 @@ void setup() {
   z21Client_setSendDataCallback(SendDataToZ21);
   status_timer = callback_timer_create();
   callback_timer_start(status_timer, 2000, true, status_handler, 0); 
+  callback_timer_start(page_repeat_timer, 150, true, page_repeat, 0);
   LOG_INFO("Initialization done\n\r");
 }
 

@@ -1,17 +1,17 @@
-/* 
+/*
  * This file is part of the WMouse distribution https://github.com/railbox/WMouse.
  * Copyright (c) 2020 Anton Nadezhdin.
- * 
- * This program is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3.
  *
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License 
+ * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "page.h"
@@ -21,6 +21,15 @@
 
 page_t current_page;
 static bool key_shift;
+typedef enum {
+  ACTION_NONE = 0,
+  ACTION_NEXT = 1,
+  ACTION_PREV = 2
+} action_t;
+static action_t current_action;
+#ifdef ESP8266
+static uint32_t action_start_time;
+#endif
 
 void page_return_back(page_t call_page, void * param)
 {
@@ -72,6 +81,7 @@ void page_start(page_t base)
 
 void page_event_next(bool state)
 {
+    current_action = ACTION_NONE;
     if (!state && (current_page != PAGE_TURNOUT)) return;
 
     switch (current_page) {
@@ -83,6 +93,10 @@ void page_event_next(bool state)
         break;
     case PAGE_LOCO:
         loco_next();
+        current_action = ACTION_NEXT;
+#ifdef ESP8266
+        action_start_time = millis();
+#endif
         break;
     case PAGE_TURNOUT:
         turnout_set(state);
@@ -94,6 +108,7 @@ void page_event_next(bool state)
 
 void page_event_prev(bool state)
 {
+    current_action = ACTION_NONE;
     if (!state && (current_page != PAGE_TURNOUT)) return;
 
     switch (current_page) {
@@ -105,6 +120,10 @@ void page_event_prev(bool state)
         break;
     case PAGE_LOCO:
         loco_prev();
+        current_action = ACTION_PREV;
+#ifdef ESP8266
+        action_start_time = millis();
+#endif
         break;
     case PAGE_TURNOUT:
         turnout_reset(state);
@@ -112,6 +131,25 @@ void page_event_prev(bool state)
     default:
         break;
     }
+}
+
+void page_repeat(void * arg)
+{
+#ifdef ESP8266
+  if (millis() < action_start_time + 500)
+    return;
+#endif
+
+  switch (current_action) {
+  case ACTION_NONE:
+    break;
+  case ACTION_PREV:
+    loco_prev();
+    break;
+  case ACTION_NEXT:
+    loco_next();
+    break;
+  }
 }
 
 void page_event_timeout(void)
@@ -127,6 +165,7 @@ void page_event_timeout(void)
 
 void page_event_enter(bool state)
 {
+    current_action = ACTION_NONE;
     if (state) return;
 
     switch (current_page) {
@@ -149,6 +188,7 @@ void page_event_enter(bool state)
 
 void page_event_back(bool state)
 {
+    current_action = ACTION_NONE;
     if (!state) return;
 
     switch (current_page) {
@@ -175,6 +215,7 @@ void page_event_back(bool state)
 
 void page_event_key(uint8_t key, bool state)
 {
+    current_action = ACTION_NONE;
     if (!state) return;
 
     switch (current_page) {
@@ -195,6 +236,7 @@ void page_event_key(uint8_t key, bool state)
 
 void page_event_shift(bool state)
 {
+    current_action = ACTION_NONE;
     key_shift = state;
 
     switch (current_page) {
@@ -210,6 +252,7 @@ void page_event_shift(bool state)
 
 void page_event_mode(bool state)
 {
+    current_action = ACTION_NONE;
     if (!state) return;
 
     switch (current_page) {
@@ -228,6 +271,7 @@ void page_event_mode(bool state)
 
 void page_event_menu(bool state)
 {
+    current_action = ACTION_NONE;
     if (!state) return;
 
     switch (current_page) {

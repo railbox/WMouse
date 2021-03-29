@@ -47,6 +47,7 @@ void page_event_key(uint8_t key, bool state);
 void page_event_mode(bool state);
 void page_event_shift(bool state);
 void page_event_menu(bool state);
+void page_repeat(void *arg);
 
 #ifdef __cplusplus
 }

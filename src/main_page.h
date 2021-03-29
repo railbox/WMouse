@@ -51,6 +51,7 @@ typedef struct {
     bool dhcp;
     uint8_t ip_z21[4];
     uint16_t turnout_id;
+    bool turnout_state;
     uint8_t loco_db_len;
     uint8_t loco_db_pos;
     loco_t loco_db[LOCO_LIST_LEN];
